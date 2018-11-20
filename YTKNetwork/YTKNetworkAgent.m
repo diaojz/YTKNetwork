@@ -232,8 +232,15 @@
         }
     }
 
+    //<diaojz
+    YTKLog(@"\nYTK网络请求Api: %@\nURL:%@\n参数:%@",
+           NSStringFromClass([request class]),
+           request.requestUrl,
+           request.requestArgument);
+    //diaojz>
+    
     // Retain request
-    YTKLog(@"Add request: %@", NSStringFromClass([request class]));
+    //    YTKLog(@"Add request: %@", NSStringFromClass([request class]));
     [self addRequestToRecord:request];
     [request.requestTask resume];
 }
@@ -358,6 +365,15 @@
 }
 
 - (void)requestDidSucceedWithRequest:(YTKBaseRequest *)request {
+    //<diaojz打印日志
+    YTKLog(@"\nYTK网络请求成功回调\n类名: %@\nBaseURL:%@\n具体接口:%@\n参数:%@成功结果%@",
+           NSStringFromClass([request class]),
+          request.currentRequest,
+          request.requestUrl,
+          request.requestArgument,
+          request.responseJSONObject);
+    //diaojz>
+    
     @autoreleasepool {
         [request requestCompletePreprocessor];
     }
@@ -376,9 +392,16 @@
 }
 
 - (void)requestDidFailWithRequest:(YTKBaseRequest *)request error:(NSError *)error {
+    //<diaojz
+    YTKLog(@"\nYTK网络请求失败回调\nRequest %@ failed, status code = %ld, error = %@",
+           NSStringFromClass([request class]),
+           (long)request.responseStatusCode,
+           error.localizedDescription);
+    //diaojz>
+    
     request.error = error;
-    YTKLog(@"Request %@ failed, status code = %ld, error = %@",
-           NSStringFromClass([request class]), (long)request.responseStatusCode, error.localizedDescription);
+//    YTKLog(@"Request %@ failed, status code = %ld, error = %@",
+//           NSStringFromClass([request class]), (long)request.responseStatusCode, error.localizedDescription);
 
     // Save incomplete download data.
     NSData *incompleteDownloadData = error.userInfo[NSURLSessionDownloadTaskResumeData];
