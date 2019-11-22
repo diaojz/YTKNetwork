@@ -53,6 +53,16 @@ NS_ASSUME_NONNULL_BEGIN
 ///  @return The result URL.
 - (NSString *)buildRequestUrl:(YTKBaseRequest *)request;
 
+#pragma mark - Customs
+/// 是否允许修改参数
+- (void)allowModifyRequestParams:(BOOL)isAllow;
+
+/// 获取当前请求参数
+- (id)getCurrentRequestParams;
+
+/// 设置当前请求参数
+- (void)setRequestParams:(id)params;
+
 @end
 
 NS_ASSUME_NONNULL_END

@@ -47,6 +47,11 @@
     dispatch_queue_t _processingQueue;
     pthread_mutex_t _lock;
     NSIndexSet *_allStatusCodes;
+    
+    //当前参数
+    NSDictionary *_currentRequestParams;
+    //是否允许修改参数
+    BOOL _isAllowModifyParams;
 }
 
 + (YTKNetworkAgent *)sharedAgent {
@@ -73,6 +78,8 @@
         // Take over the status code validation
         _manager.responseSerializer.acceptableStatusCodes = _allStatusCodes;
         _manager.completionQueue = _processingQueue;
+        
+        _isAllowModifyParams = NO;
     }
     return self;
 }
@@ -168,6 +175,16 @@
     YTKRequestMethod method = [request requestMethod];
     NSString *url = [self buildRequestUrl:request];
     id param = request.requestArgument;
+    
+    if (_isAllowModifyParams) {
+        //获取当前请求参数
+        _currentRequestParams = param;
+        [self getCurrentRequestParams];
+        
+        //重新设置参数
+        param = _currentRequestParams;
+    }
+    
     AFConstructingBlock constructingBlock = [request constructingBodyBlock];
     AFHTTPRequestSerializer *requestSerializer = [self requestSerializerForRequest:request];
 
@@ -587,6 +604,27 @@
 
 - (void)resetURLSessionManagerWithConfiguration:(NSURLSessionConfiguration *)configuration {
     _manager = [[AFHTTPSessionManager alloc] initWithSessionConfiguration:configuration];
+}
+
+#pragma mark - Customs
+/// 是否允许修改参数
+- (void)allowModifyRequestParams:(BOOL)isAllow {
+    _isAllowModifyParams = isAllow;
+}
+
+/// 获取当前请求参数
+- (id)getCurrentRequestParams {
+    if (_currentRequestParams) {
+        return _currentRequestParams;
+    }
+    return nil;
+}
+
+/// 设置当前请求参数
+- (void)setRequestParams:(id)params {
+    if (params) {
+        _currentRequestParams = params;
+    }
 }
 
 @end
